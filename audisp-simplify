@@ -33,7 +33,7 @@
 
 use POSIX qw(strftime);
 use strict;
-umask 0077;
+umask 0033;
 
 # mitigation for bug with timezone
 $ENV{TZ} = strftime( "%Z", localtime() );
