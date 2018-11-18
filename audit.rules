@@ -1,0 +1,91 @@
+# delete all existing rules
+-D
+# disable auditing during load
+-e 0
+# fail silently
+-f 0
+# 65k buffer
+-b 65536
+# no rate
+-r 0
+# continue loading if bad rule and report
+-c
+
+# Attempts to see or change auditing system configuration
+-w /etc/audit -p w -k auditing_system
+-w /etc/audisp -k auditing_system
+#-w /etc/rsyslog.d -k auditing_system
+#-w /etc/rsyslog.conf -k auditing_system
+#-w /etc/audisp/plugins.d/syslog.conf -k auditing_system
+#-w /etc/audit/rules.d/audit.rules -k auditing_system
+
+# Record time moditifaction events
+#-a exit,always -S stime.* -k system_time
+#-a exit,always -S setrlimit.* -k system_time
+
+# Record Events that Modify User/Group Information
+# audit_account_changes
+#-w /etc/group -p w -k account_changes
+#-w /etc/passwd -p w -k account_changes
+#-w /etc/gshadow -p w -k account_changes
+#-w /etc/shadow -p w -k account_changes
+#-w /etc/security/opasswd -p w -k account_changes
+#-w /usr/sbin/useradd -p x -k account_changes
+#-w /usr/sbin/userdel -p x -k account_changes
+#-w /usr/sbin/usermod -p x -k account_changes
+#-w /usr/bin/passwd -p x -k account_changes
+#-a always,exit -S useradd -S userdel -S usermod -S passwd -k account_changes
+
+# Record Events that Modify the System's Network Environment
+# audit_network_modifications
+-a always,exit -F arch=ARCH -S sethostname -S setdomainname -k audit_network_modifications
+#-w /etc/issue -p wa -k audit_network_modifications
+#-w /etc/issue.net -p wa -k audit_network_modifications
+#-w /etc/hosts -p wa -k audit_network_modifications
+#-w /etc/sysconfig/network -p wa -k audit_network_modifications
+
+#Record Events that Modify the System's Mandatory Access Controls
+#-w /etc/selinux/ -p wa -k selinux_policy
+
+#Record Attempts to Alter Logon and Logout Events
+#-w /var/log/faillog -p wa -k logins
+#-w /var/log/lastlog -p wa -k logins
+
+#Record Attempts to Alter Process and Session Initiation Information
+#-w /var/run/utmp -p wa -k session
+#-w /var/log/btmp -p wa -k session
+#-w /var/log/wtmp -p wa -k session
+
+#Ensure auditd Collects Unauthorized Access Attempts to Files (unsuccessful)
+#-a always,exit -F arch=b32 -S creat -S open -S openat -S open_by_handle_at -S truncate -S ftruncate -F exit=-EACCES -F auid>=500 -F auid!=4294967295 -k access
+#-a always,exit -F arch=b32 -S creat -S open -S openat -S open_by_handle_at -S truncate -S ftruncate -F exit=-EPERM -F auid>=500 -F auid!=4294967295 -k access
+#-a always,exit -F arch=b64 -S creat -S open -S openat -S open_by_handle_at -S truncate -S ftruncate -F exit=-EACCES -F auid>=500 -F auid!=4294967295 -k access
+#-a always,exit -F arch=b64 -S creat -S open -S openat -S open_by_handle_at -S truncate -S ftruncate -F exit=-EPERM -F auid>=500 -F auid!=4294967295 -k access
+
+#Ensure auditd Collects Information on Exporting to Media (successful)
+#-a always,exit -F arch=ARCH -S mount -F auid>=500 -F auid!=4294967295 -k export
+
+#Ensure auditd Collects File Deletion Events by User
+#-a always,exit -F arch=ARCH -S rmdir -S unlink -S unlinkat -S rename -S renameat -F auid>=500 -F auid!=4294967295 -k delete
+
+#Ensure auditd Collects System Administrator Actions
+#-w /etc/sudoers -p wa -k sudo_actions
+#-a always,exit -S sudo -k sudo_actions
+
+#Ensure auditd Collects Information on Kernel Module Loading and Unloading
+#-w /sbin/insmod -p x -k modules
+#-w /sbin/rmmod -p x -k modules
+#-w /sbin/modprobe -p x -k modules
+#-a always,exit -F arch=b64 -S init_module -S delete_module -k modules -F exit=0
+
+# Generics
+
+# Monitor for any config changes in /etc/  - really chatty
+#-w /etc/ -p w -k config_change -F exit=0
+
+# Captures all executions, - really chatty
+-a exit,always -F arch=b32 -F exit=0 -S execve -k command_log
+-a exit,always -F arch=b64 -F exit=0 -S execve -k command_log
+
+# activate auditing
+-e 1
