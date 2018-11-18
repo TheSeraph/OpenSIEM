@@ -98,11 +98,11 @@ systemctl start td-agent elasticsearch kibana nginx >/dev/null 2>&1
 echo ""
 echo "Creating selinux policies"
 cat /var/log/audit/audit.log | grep nginx | grep denied | audit2allow -M OpenSIEM
-sudo semodule -i OpenSIEM.pp
+semodule -i OpenSIEM.pp
 setenforce 1
 echo ""
 
 systemctl restart td-agent elasticsearch kibana nginx >/dev/null 2>&1
 
-
+echo "Incoming 24224"
 
