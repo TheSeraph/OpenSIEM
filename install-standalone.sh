@@ -70,7 +70,7 @@ systemctl enable td-agent elasticsearch kibana nginx >/dev/null 2>&1
 echo ""
 echo "Creating temporary self-signed certificates for Nginx"
 echo "This may take awhile"
-# openssl dhparam -out /etc/ssl/certs/dhparam.pem 4096
+openssl dhparam -out /etc/ssl/certs/dhparam.pem 4096
 openssl req -x509 -days 365 -nodes -newkey rsa:2048 -keyout /etc/ssl/certs/opensiem-pkcs5.key -out  /etc/ssl/certs/opensiem-pkcs5.crt -subj "/C=GB/O=Arkferos Ltd/CN=kibana.arkferos.com"
 
 echo ""
@@ -82,27 +82,27 @@ cp opensiem.conf /etc/nginx/conf.d/opensiem.conf
 echo "Creating FluentD Config file..."
 cp td-agent-svr.conf /etc/td-agent/td-agent.conf
 
-# echo ""
-# echo "Turning it on"
-# systemctl start elasticsearch 
-# systemctl start kibana 
-# systemctl start nginx 
-# systemctl start td-agent
+echo ""
+echo "Turning it on"
+systemctl start elasticsearch 
+systemctl start kibana 
+systemctl start nginx 
+systemctl start td-agent
 
-# systemctl status td-agent elasticsearch kibana nginx >/dev/null 2>&1
+systemctl status td-agent elasticsearch kibana nginx >/dev/null 2>&1
 
-# echo "Turning off selinux to configure nginx"
-# setenforce 0 
-# echo ""
-# systemctl start td-agent elasticsearch kibana nginx >/dev/null 2>&1
-# echo ""
-# echo "Creating selinux policies"
-# cat /var/log/audit/audit.log | grep nginx | grep denied | audit2allow -M OpenSIEM
-# sudo semodule -i OpenSIEM.pp
-# setenforce 1
-# echo ""
+echo "Turning off selinux to configure policies"
+setenforce 0 
+echo ""
+systemctl start td-agent elasticsearch kibana nginx >/dev/null 2>&1
+echo ""
+echo "Creating selinux policies"
+cat /var/log/audit/audit.log | grep nginx | grep denied | audit2allow -M OpenSIEM
+sudo semodule -i OpenSIEM.pp
+setenforce 1
+echo ""
 
-# systemctl restart td-agent elasticsearch kibana nginx >/dev/null 2>&1
+systemctl restart td-agent elasticsearch kibana nginx >/dev/null 2>&1
 
 
 
